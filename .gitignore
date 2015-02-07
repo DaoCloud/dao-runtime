@@ -1,0 +1,5 @@
+*.egg-info/
+nosetests.xml
+*.pyc
+*.pyo
+/server/develop
