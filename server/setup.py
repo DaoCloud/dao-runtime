@@ -13,4 +13,11 @@ setup(name='server',
       zip_safe=False,
       install_requires=[
       ],
+      extras_require={
+          'test': [
+              'matchers',
+              'Mock',
+              'pyhamcrest',
+          ]
+      },
       )
