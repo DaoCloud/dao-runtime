@@ -12,6 +12,7 @@ setup(name='server',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
+          'enum34',
       ],
       extras_require={
           'test': [
