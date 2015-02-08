@@ -11,6 +11,9 @@ class TestSeqGenerator(unittest.TestCase):
     def setUp(self):
         _set_seq_id(0)
 
+    def tearDown(self):
+        _set_seq_id(0)
+
     def test_seq_id(self):
         assert_that(next_seq_id(), is_(1))
         assert_that(next_seq_id(), is_(2))
