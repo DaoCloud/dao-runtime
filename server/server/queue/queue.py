@@ -52,5 +52,6 @@ class CommandQueue(object):
         :param command: command to be updated
         :type command: Command
         :raises: RuntimeNotFound if runtime not found
+        :raises: CommandNotInQueue if command not found
         """
         pass
