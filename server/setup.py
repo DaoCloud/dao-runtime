@@ -13,6 +13,7 @@ setup(name='server',
       zip_safe=False,
       install_requires=[
           'enum34',
+          'Flask',
       ],
       extras_require={
           'test': [
