@@ -19,6 +19,7 @@ setup(name='server',
           'test': [
               'matchers',
               'Mock',
+              'nose-parameterized',
               'pyhamcrest',
           ]
       },

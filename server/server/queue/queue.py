@@ -45,13 +45,17 @@ class CommandQueue(object):
         pass
 
     @abc.abstractmethod
-    def set_command_result(self, runtime_name, command):
+    def set_command_result(self, runtime_name, seq_id, success, result):
         """ Update command result.
 
         :param runtime_name: name of runtime
         :type runtime_name: str
-        :param command: command to be updated
-        :type command: Command
+        :param seq_id: command sequence id
+        :type seq_id: int
+        :param success: success or fail
+        :type success: bool
+        :param result: result
+        :type result: TODO to be defined
         :raises: RuntimeNotFound if runtime not found
         :raises: CommandNotInQueue if command not found
         """

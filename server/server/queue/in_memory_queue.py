@@ -26,22 +26,32 @@ class MemoryCommandQueue(CommandQueue):
 
             return cmds
 
-    def set_command_result(self, runtime_name, command):
+    def set_command_result(self, runtime_name, seq_id, success, result):
         with self._lock:
-            if runtime_name not in self._queue:
-                raise RuntimeNotFound("Runtime not found")
+            command = self._get_command(runtime_name, seq_id)
 
-            indexes = [i for i, cmd in enumerate(self._queue[runtime_name])
-                       if cmd.seq_id == command.seq_id]
-            if not indexes:
-                raise CommandNotInQueue("Command not found in queue")
+            if success:
+                command.done(result)
+            else:
+                command.fail(result)
 
-            # Only one command with specific req_id
-            assert len(indexes) == 1
+    # not locked
+    def _get_command(self, runtime_name, seq_id):
+        if runtime_name not in self._queue:
+            raise RuntimeNotFound("Runtime not found")
 
-            index = indexes[0]
-            self._queue[runtime_name][index] = command
+        indexes = [i for i, cmd in enumerate(self._queue[runtime_name])
+                   if cmd.seq_id == seq_id]
+        if not indexes:
+            raise CommandNotInQueue("Command not found in queue")
 
+        # Only one command with specific req_id
+        assert len(indexes) == 1
+
+        index = indexes[0]
+        return self._queue[runtime_name][index]
+
+    # not locked
     def _peek_queue(self, runtime_name, seq_id=0):
         if runtime_name not in self._queue:
             return []

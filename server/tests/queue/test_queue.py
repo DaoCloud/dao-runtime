@@ -48,25 +48,27 @@ class TestCommandQueue(unittest.TestCase):
     def test_set_result(self):
         queue = MemoryCommandQueue()
 
-        command = Command('test')
-        queue.add_command('runtime-1', command)
-        queue.add_command('runtime-1', Command('test'))
+        queue.add_command('runtime-1', Command('test'))  # seq_id: 1
+        queue.add_command('runtime-1', Command('test'))  # seq_id: 2
 
-        command.fail()
-        queue.set_command_result('runtime-1', command)
+        queue.set_command_result('runtime-1', 1, True, 100)
 
         commands = queue.get_queued_commands('runtime-1')
         assert_that(commands, has_length(1))
+
+        command = queue._get_command('runtime-1', 1)
+        assert_that(command.state(), is_(State.DONE))
+        assert_that(command.result, is_(100))
 
     @raises(RuntimeNotFound)
     def test_set_result_no_runtime(self):
         queue = MemoryCommandQueue()
         command = Command('test')
         queue.add_command('runtime-1', command)
-        queue.set_command_result('runtime-2', command)
+        queue.set_command_result('runtime-2', 1, True, 100)
 
     @raises(CommandNotInQueue)
     def test_set_result_no_command(self):
         queue = MemoryCommandQueue()
         queue.add_command('runtime-1', Command('test'))
-        queue.set_command_result('runtime-1', Command('test'))
+        queue.set_command_result('runtime-1', 2, True, 100)

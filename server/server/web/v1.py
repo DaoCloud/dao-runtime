@@ -4,7 +4,8 @@ import json
 from api import api, api_url, Service
 from server.command.command import CommandEncoder
 from server.registry import register, unregister, Runtime
-from server.queue.in_memory_queue import queue
+from server.queue.in_memory_queue import queue, CommandNotInQueue
+from server.queue.in_memory_queue import RuntimeNotFound
 
 VERSION = "v1"
 
@@ -37,4 +38,19 @@ def polling(runtime):
 
 @api.route(api_url(VERSION, Service.CALLBACK), methods=['POST'])
 def callback(runtime):
-    return 'callback ' + runtime
+    payload = request.get_json()
+
+    # TODO: Refactor me! This is such a mess.
+    if not payload or 'seq_id' not in payload or 'result' not in payload or \
+       'ok' not in payload:
+        return make_response('Bad Request', 400)
+
+    seq_id = payload['seq_id']
+    result = payload['result']
+    ok = payload['ok']
+
+    try:
+        queue.set_command_result(runtime, seq_id, ok, result)
+        return ''
+    except (RuntimeNotFound, CommandNotInQueue) as e:
+        return make_response(e.message, 404)

@@ -6,6 +6,10 @@ from json import JSONEncoder
 
 from server.command.seq_generator import next_seq_id
 
+# TODO: More strict state transition.
+# For example, right now we allow state transition from DONE to FAIL, which
+# doesn't make sense. We should throw exception for that.
+
 
 @enum.unique
 class State(enum.Enum):
