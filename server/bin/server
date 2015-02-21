@@ -1,7 +1,34 @@
 #!/usr/bin/env python
 
+import random
+import time
+import threading
+
+from server.registry import get_runtimes
+from server.command.echo_command import EchoCommand
+from server.queue.in_memory_queue import queue
 from server.web.api import api
 import server.web.v1
 
+
+
+# Automatically insert commands to queue
+def _auto_command_inserter():
+
+    NAMES = ['Frank', 'Roby', 'Golphen', 'Kay', 'Robbie', 'James']
+
+    while True:
+        print 'Inserting commands...'
+        for runtime in get_runtimes():
+            command = EchoCommand('hello, ' + random.choice(NAMES))
+            queue.add_command(runtime, command)
+            print 'add command: %s to runtime %s' % (command, runtime)
+        time.sleep(5)
+
+
 if __name__ == '__main__':
+    thread = threading.Thread(target=_auto_command_inserter)
+    thread.setDaemon(True)
+    thread.start()
+
     api.run()

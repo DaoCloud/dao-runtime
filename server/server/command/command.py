@@ -1,8 +1,8 @@
-# TODO(pyu): Implement real command
-# TODO(pyu): Implement marshal/unmarshal command
 
 import enum
 import time
+
+from json import JSONEncoder
 
 from server.command.seq_generator import next_seq_id
 
@@ -18,11 +18,17 @@ class State(enum.Enum):
 
 class BaseCommand(object):
 
+    # Number of seconds. If not hearing the command back for this amount of
+    # time, set the command state as TIMEOUT.
     DEFAULT_TIMEOUT = 30
+
+    # Filtered fields from dict/json, besides fields starting with _
+    HIDDEN_FIELDS = ['result']
 
     def __init__(self, name, seq_id):
         self.name = name
         self.seq_id = seq_id
+        self.result = None
         self._state = State.QUEUED
         self._started_at = time.time()
 
@@ -43,17 +49,26 @@ class BaseCommand(object):
     def start(self):
         self._state = State.STARTED
 
-    # TODO(pyu): reason
-    def fail(self):
+    def fail(self, result=None):
+        self.result = result
         self._state = State.FAIL
 
-    # TODO(pyu): result
-    def done(self):
+    def done(self, result=None):
+        self.result = result
         self._state = State.DONE
 
     def __repr__(self):
         return "<Command seq_id: %d, name: %s, state: %s>" % \
                (self.seq_id, self.name, self._state)
+
+    def to_dict(self):
+        """ dict representation of command. It filters out HIDDEN_FIELDS and
+        fields starting with _ .
+        """
+        return dict(
+                   (k, v) for k, v in self.__dict__.items()
+                   if k not in self.HIDDEN_FIELDS and not k.startswith('_')
+               )
 
 
 class Command(BaseCommand):
@@ -61,5 +76,13 @@ class Command(BaseCommand):
     def __init__(self, name):
         super(Command, self).__init__(name, next_seq_id())
 
-    def __repr__(self):
-        return super(Command, self).__repr__()
+
+class CommandEncoder(JSONEncoder):
+    """ Json encoder for Command
+    """
+
+    def default(self, o):
+        if isinstance(o, Command):
+            return o.to_dict()
+        else:
+            super(CommandEncoder, self).default(o)

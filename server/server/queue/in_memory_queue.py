@@ -47,3 +47,10 @@ class MemoryCommandQueue(CommandQueue):
             return []
         return [cmd for cmd in self._queue[runtime_name]
                 if cmd.seq_id > seq_id and cmd.is_queued()]
+
+    # For unit test
+    def _clear(self):
+        self._queue = {}
+
+
+queue = MemoryCommandQueue()

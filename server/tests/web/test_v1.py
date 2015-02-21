@@ -1,10 +1,13 @@
 
+import json
 from hamcrest import *  # noqa
 import unittest
 
+from server.command.echo_command import EchoCommand
+from server.queue.in_memory_queue import queue
+import server.registry as registry
 from server.web.api import api
 import server.web.v1  # noqa
-import server.registry as registry
 
 
 class TestApiV1(unittest.TestCase):
@@ -12,6 +15,7 @@ class TestApiV1(unittest.TestCase):
     def setUp(self):
         self.app = api.test_client()
         registry.clear()
+        queue._clear()
 
     def test_register_unregister(self):
         result = self.app.post('/api/v1/runtimes',
@@ -46,9 +50,40 @@ class TestApiV1(unittest.TestCase):
         assert_that(result.status_code, is_(400))
 
     def test_polling(self):
+        # Start empty queue, polling returns empty list
         result = self.app.get('/api/v1/runtimes/sample/requests')
         assert_that(result.status_code, is_(200))
-        assert_that(result.data, is_('polling sample'))
+        assert_that(result.data, is_('[]'))
+
+        # Add 2 commands in queue, and polling returns 2 commands
+        queue.add_command('sample', EchoCommand('test-1'))  # seq_id: 1
+        queue.add_command('sample', EchoCommand('test-2'))  # seq_id: 2
+
+        result = self.app.get('/api/v1/runtimes/sample/requests')
+        assert_that(result.status_code, is_(200))
+        data = json.loads(result.data)
+        assert_that(data, has_length(2))
+        assert_that(data[0]['seq_id'], is_(1))
+        assert_that(data[0]['name'], is_('echo'))
+        assert_that(data[0]['message'], is_('test-1'))
+        assert_that(data[1]['seq_id'], is_(2))
+        assert_that(data[1]['name'], is_('echo'))
+        assert_that(data[1]['message'], is_('test-2'))
+
+        # polling again, returns empty list
+        result = self.app.get('/api/v1/runtimes/sample/requests')
+        assert_that(result.status_code, is_(200))
+        assert_that(result.data, is_('[]'))
+
+        # Add 2 commands in queue again, and polling
+        queue.add_command('sample', EchoCommand('test-3'))  # seq_id: 3
+        queue.add_command('sample', EchoCommand('test-4'))  # seq_id: 4
+
+        # Polling from seq_id 3 this time
+        result = self.app.get('/api/v1/runtimes/sample/requests?seq_id=3')
+        assert_that(result.status_code, is_(200))
+        data = json.loads(result.data)
+        assert_that(data, has_length(1))
 
     def test_callback(self):
         result = self.app.post('/api/v1/runtimes/sample/callback')

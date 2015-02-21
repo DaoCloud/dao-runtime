@@ -29,3 +29,7 @@ def clear():
 
 def is_registered(runtime_name):
     return runtime_name in runtimes
+
+
+def get_runtimes():
+    return runtimes.keys()
