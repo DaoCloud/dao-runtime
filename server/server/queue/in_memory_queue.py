@@ -1,3 +1,4 @@
+# Copyright 2015 DaoCloud Inc. All Rights Reserved.
 import threading
 
 from server.queue.queue import CommandQueue, RuntimeNotFound, CommandNotInQueue

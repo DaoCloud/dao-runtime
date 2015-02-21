@@ -1,3 +1,4 @@
+# Copyright 2015 DaoCloud Inc. All Rights Reserved.
 import unittest
 from hamcrest import *  # noqa
 

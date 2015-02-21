@@ -1,3 +1,4 @@
+# Copyright 2015 DaoCloud Inc. All Rights Reserved.
 
 class Runtime(object):
     """ Service in registry

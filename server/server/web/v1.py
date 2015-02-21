@@ -1,3 +1,4 @@
+# Copyright 2015 DaoCloud Inc. All Rights Reserved.
 from flask import request, make_response
 import json
 
