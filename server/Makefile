@@ -29,6 +29,7 @@ develop: $(BIN)/python
 clean:
 	@printf "$(BOLD)Removing virtualenv...$(NORMAL)\n"
 	rm -rf $(DEVELOP)
+	rm -rf server.egg-info nosetests.xml
 
 .PHONY: test
 test: develop $(BIN)/nosetests
