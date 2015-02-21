@@ -19,10 +19,12 @@ class MemoryCommandQueue(CommandQueue):
 
     def get_queued_commands(self, runtime_name, seq_id=0):
         with self._lock:
-            if runtime_name not in self._queue:
-                return []
-            return [cmd for cmd in self._queue[runtime_name]
-                    if cmd.seq_id > seq_id and cmd.is_queued()]
+            cmds = self._peek_queue(runtime_name, seq_id)
+
+            for cmd in cmds:
+                cmd.start()
+
+            return cmds
 
     def set_command_result(self, runtime_name, command):
         with self._lock:
@@ -39,3 +41,9 @@ class MemoryCommandQueue(CommandQueue):
 
             index = indexes[0]
             self._queue[runtime_name][index] = command
+
+    def _peek_queue(self, runtime_name, seq_id=0):
+        if runtime_name not in self._queue:
+            return []
+        return [cmd for cmd in self._queue[runtime_name]
+                if cmd.seq_id > seq_id and cmd.is_queued()]

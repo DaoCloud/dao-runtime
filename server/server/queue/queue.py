@@ -32,7 +32,8 @@ class CommandQueue(object):
     @abc.abstractmethod
     def get_queued_commands(self, runtime_name, seq_id):
         """ Get all queued commands owned by runtime, whose seq_id is bigger
-        than the given one.
+        than the given one. After the commands are fetched, set them as
+        STARTED.
 
         :param runtime_name: name of runtime
         :type runtime_name: str

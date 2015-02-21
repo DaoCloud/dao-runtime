@@ -3,7 +3,7 @@ import unittest
 from hamcrest import *  # noqa
 from nose.tools import raises
 
-from server.command.command import Command
+from server.command.command import Command, State
 from server.command.seq_generator import _set_seq_id
 from server.queue.in_memory_queue import MemoryCommandQueue
 from server.queue.queue import RuntimeNotFound, CommandNotInQueue
@@ -28,6 +28,21 @@ class TestCommandQueue(unittest.TestCase):
         commands = queue.get_queued_commands('runtime-2')
         assert_that(commands, has_length(0))
         commands = queue.get_queued_commands('runtime-1', 2)
+        assert_that(commands, has_length(0))
+
+    def test_queue_cmd_state(self):
+        queue = MemoryCommandQueue()
+
+        queue.add_command('runtime-1', Command('test'))
+        queue.add_command('runtime-1', Command('test'))
+
+        commands = queue.get_queued_commands('runtime-1')
+        assert_that(commands, has_length(2))
+
+        for cmd in queue._peek_queue('runtime-1'):
+            assert_that(cmd.state(), is_(State.STARTED))
+
+        commands = queue.get_queued_commands('runtime-1')
         assert_that(commands, has_length(0))
 
     def test_set_result(self):
