@@ -1,0 +1,7 @@
+- Consider thrift for payload format enforcement. Define schema at one place and
+  generate code for golang and python.
+- Client side lacks unit test.
+- Logging for both server and client side.
+- Daemonize client side.
+- Config file for client side.
+- A lot ...
