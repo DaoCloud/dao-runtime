@@ -13,11 +13,11 @@ import (
 // Demonstration purpose only.
 
 func Register() {
-	service := &Service{
+	runtime := &Runtime{
 		Name: runtimeName,
 	}
 
-	body, err := json.Marshal(service)
+	body, err := json.Marshal(runtime)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)

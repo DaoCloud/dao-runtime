@@ -1,5 +1,5 @@
 package main
 
-type Service struct {
+type Runtime struct {
 	Name string `json:"name"`
 }
