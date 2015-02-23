@@ -46,8 +46,7 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM)
 	go func() {
 		<-c
-		cleanup()
-		os.Exit(0)
+		exit(0)
 	}()
 
 	// Register runtime
@@ -62,12 +61,23 @@ func main() {
 			case <-ticker.C:
 				commands := Polling()
 				for _, command := range commands {
-					fmt.Println(command)
+					// Process in parallel
+					go func(command Command) {
+						result, err := run_command(command)
+						fmt.Printf("command of %d: %s, %s\n", command.SeqId, command.Name, command.Message)
+						CallbackResult(command, result, err)
+						if err != nil {
+							fmt.Fprintf(os.Stdout, "result of %d: %q\n", command.SeqId, err)
+						} else {
+							fmt.Fprintf(os.Stdout, "result of %d: %q\n", command.SeqId, result)
+						}
+					}(command)
 				}
 			}
 		}
 	}()
 
+	// Blocks main
 	quit := make(chan struct{})
 	<-quit
 }

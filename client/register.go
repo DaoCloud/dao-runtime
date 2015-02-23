@@ -20,7 +20,7 @@ func Register() {
 	body, err := json.Marshal(runtime)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	registerUrl := &url.URL{
@@ -31,12 +31,12 @@ func Register() {
 	resp, err := http.Post(registerUrl.String(), "application/json", bytes.NewReader(body))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	if resp.StatusCode != 200 {
 		fmt.Fprintf(os.Stderr, "Error: register failed with %s", resp.Status)
-		os.Exit(1)
+		exit(1)
 	}
 }
 
@@ -49,17 +49,17 @@ func Unregister() {
 	req, err := http.NewRequest("DELETE", unregisterUrl.String(), nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	if resp.StatusCode != 200 {
 		fmt.Fprintf(os.Stderr, "Error: unregister failed with %s", resp.Status)
-		os.Exit(1)
+		exit(1)
 	}
 }

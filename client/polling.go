@@ -19,7 +19,7 @@ func Polling() []Command {
 	resp, err := http.Get(pollingUrl.String())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	defer resp.Body.Close()
@@ -29,7 +29,7 @@ func Polling() []Command {
 	err = json.Unmarshal(body, &commands)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+		exit(1)
 	}
 
 	return commands

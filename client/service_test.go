@@ -11,9 +11,12 @@ func TestEcho(t *testing.T) {
 
 	s := &service{}
 	for _, message := range messages {
-		received := s.echo(message)
+		received, err := s.Echo(message)
 		if received != message {
 			t.Errorf("Echo(%q) == %q, want %q", message, received, message)
+		}
+		if err != nil {
+			t.Errorf("Echo() returned nil")
 		}
 	}
 }
