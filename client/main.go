@@ -29,6 +29,8 @@ func main() {
 
 	Register()
 	fmt.Println(runtimeName + " registered")
-	Unregister()
-	fmt.Println(runtimeName + " unregistered")
+	defer func() {
+		Unregister()
+		fmt.Println(runtimeName + " unregistered")
+	}()
 }
